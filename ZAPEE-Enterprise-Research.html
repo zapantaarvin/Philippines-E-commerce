@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZAPEE Ventures — Import & E-Commerce Blueprint</title>
+<style>
+:root {
+  --gold:#C9A84C;--gold-l:#E8C96D;--gold-d:#8B6914;
+  --navy:#0A0F1E;--navy-m:#111827;--navy-c:#161D2E;--navy-b:#1E2940;
+  --slate:#8892A4;--white:#F0F4FF;--white-d:#A8B4C8;
+  --green:#22C55E;--red:#EF4444;--amber:#F59E0B;--blue:#3B82F6;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:var(--navy);color:var(--white);}
+
+/* ── CAROUSEL ── */
+.carousel{width:100%;height:100vh;overflow:hidden;}
+.track{display:flex;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);will-change:transform;}
+.slide{min-width:100vw;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.sbody{flex:1;overflow-y:auto;padding:4.5rem 3rem 5rem;scrollbar-width:thin;scrollbar-color:var(--navy-b) transparent;}
+.sbody::-webkit-scrollbar{width:4px;}
+.sbody::-webkit-scrollbar-thumb{background:var(--navy-b);border-radius:2px;}
+
+/* ── TOP BAR ── */
+.topbar{position:fixed;top:0;left:0;right:0;height:50px;background:rgba(10,15,30,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--navy-b);display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem;z-index:300;}
+.brand{font-size:.8rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);}
+.topbar-right{display:flex;align-items:center;gap:1rem;}
+.slide-ctr{font-size:.73rem;color:var(--slate);}
+.slide-ctr b{color:var(--white);}
+.notes-btn{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:var(--gold);padding:.3rem .85rem;border-radius:8px;font-size:.73rem;cursor:pointer;font-family:inherit;transition:all .2s;}
+.notes-btn:hover{background:rgba(201,168,76,.2);}
+.prog-bar{position:fixed;top:50px;left:0;right:0;height:2px;background:var(--navy-b);z-index:300;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));transition:width .4s ease;}
+
+/* ── BOTTOM NAV ── */
+.botnav{position:fixed;bottom:0;left:0;right:0;height:56px;background:rgba(10,15,30,.96);backdrop-filter:blur(20px);border-top:1px solid var(--navy-b);display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem;z-index:300;}
+.nav-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--navy-b);background:var(--navy-c);color:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;font-family:inherit;}
+.nav-btn:hover:not(:disabled){background:rgba(201,168,76,.1);border-color:var(--gold);color:var(--gold);}
+.nav-btn:active{transform:scale(.92);}
+.nav-btn:disabled{opacity:.22;cursor:default;}
+.dots{display:flex;gap:5px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--navy-b);cursor:pointer;transition:all .3s;}
+.dot.on{width:20px;border-radius:3px;background:var(--gold);}
+
+/* ── SHARED ── */
+.lbl{font-size:.67rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem;}
+.lbl::before{content:'';width:16px;height:1px;background:var(--gold);}
+.ttl{font-size:clamp(1.55rem,3.2vw,2.5rem);font-weight:800;letter-spacing:-.02em;line-height:1.15;margin-bottom:.55rem;}
+.sub{font-size:.9rem;color:var(--white-d);max-width:680px;margin-bottom:1.6rem;line-height:1.6;}
+.accent{background:linear-gradient(135deg,var(--gold-d),var(--gold),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.chip{display:inline-flex;padding:.22rem .65rem;border-radius:100px;font-size:.67rem;font-weight:600;border:1px solid;}
+.chip-g{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#86efac;}
+.chip-a{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fcd34d;}
+.chip-r{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#fca5a5;}
+.chip-gold{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.3);color:var(--gold);}
+.info-box{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.18);border-radius:10px;padding:.85rem 1.2rem;font-size:.82rem;color:#93c5fd;line-height:1.55;}
+.warn-box{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.18);border-radius:10px;padding:.85rem 1.2rem;font-size:.82rem;color:#fca5a5;line-height:1.55;}
+
+/* ── COVER ── */
+.cover-slide{align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;}
+.cvgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.04) 1px,transparent 1px);background-size:55px 55px;animation:gmv 25s linear infinite;}
+@keyframes gmv{to{background-position:0 55px;}}
+.cvglow{position:absolute;width:480px;height:480px;background:radial-gradient(circle,rgba(201,168,76,.1) 0%,transparent 70%);animation:gp 4s ease-in-out infinite;}
+@keyframes gp{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.12);opacity:1}}
+.cvinner{position:relative;z-index:1;}
+.cvlbl{font-size:.68rem;letter-spacing:.38em;text-transform:uppercase;color:var(--gold);margin-bottom:1.3rem;animation:fup .7s ease both .2s;}
+.cvh{font-size:clamp(2rem,5.5vw,4.2rem);font-weight:900;letter-spacing:-.03em;line-height:1.08;margin-bottom:1.1rem;animation:fup .7s ease both .4s;}
+.cvp{font-size:.97rem;color:var(--white-d);max-width:500px;margin:0 auto 1.8rem;animation:fup .7s ease both .6s;}
+.cvchips{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-bottom:2.2rem;animation:fup .7s ease both .8s;}
+.cvchip{padding:.28rem .85rem;border-radius:100px;font-size:.7rem;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);color:var(--gold);}
+.cvhint{font-size:.72rem;color:var(--slate);display:flex;align-items:center;gap:.45rem;justify-content:center;animation:fup .7s ease both 1s;}
+.kpill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);padding:.18rem .52rem;border-radius:5px;font-size:.67rem;}
+@keyframes fup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── KPI GRID ── */
+.kgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;max-width:980px;}
+.kcard{background:var(--navy-c);border:1px solid var(--navy-b);border-radius:13px;padding:1.3rem;position:relative;overflow:hidden;transition:transform .25s,border-color .25s;}
+.kcard:hover{transform:translateY(-3px);border-color:rgba(201,168,76,.35);}
+.kcard::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-d),var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .35s;}
+.kcard:hover::after{transform:scaleX(1);}
+.klbl{font-size:.63rem;letter-spacing:.13em;text-transform:uppercase;color:var(--slate);margin-bottom:.32rem;}
+.kval{font-size:1.85rem;font-weight:800;color:var(--gold);letter-spacing:-.02em;margin-bottom:.18rem;font-variant-numeric:tabular-nums;}
+.kdesc{font-size:.74rem;color:var(--white-d);line-height:1.42;}
+.kico{position:absolute;top:1.1rem;right:1.1rem;font-size:1.35rem;opacity:.22;}
+
+/* ── ROADMAP ── */
+.roadmap{display:flex;gap:.6rem;position:relative;max-width:1100px;margin-bottom:2rem;}
+.roadmap::before{content:'';position:absolute;top:25px;left:26px;right:26px;height:2px;background:linear-gradient(90deg,transparent,var(--gold-d),var(--gold),var(--gold-d),transparent);}
+.rm-node{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1;}
+.rm-circle{width:50px;height:50px;border-radius:50%;background:var(--navy-c);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:.6rem;box-shadow:0 0 14px rgba(201,168,76,.2);position:relative;transition:all .25s;cursor:pointer;}
+.rm-circle:hover{box-shadow:0 0 28px rgba(201,168,76,.5);transform:scale(1.12);border-color:var(--gold-l);}
+.rm-n{position:absolute;top:-5px;right:-5px;width:17px;height:17px;background:var(--gold);color:var(--navy);border-radius:50%;font-size:.58rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.rm-name{font-size:.78rem;font-weight:700;margin-bottom:.2rem;}
+.rm-detail{font-size:.65rem;color:var(--slate);line-height:1.4;max-width:100px;}
+.rm-time{display:inline-block;font-size:.6rem;color:var(--gold);background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.18);border-radius:100px;padding:.1rem .45rem;margin-top:.3rem;}
+.rm-click-hint{font-size:.7rem;color:var(--slate);margin-top:.25rem;}
+
+/* ── PHASE MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{background:var(--navy-c);border:1px solid var(--navy-b);border-radius:18px;width:92%;max-width:800px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;transform:translateY(18px) scale(.97);transition:transform .3s;}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1);}
+.modal-hdr{display:flex;align-items:flex-start;gap:1rem;padding:1.35rem 1.5rem;border-bottom:1px solid var(--navy-b);flex-shrink:0;}
+.modal-ico{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.modal-meta{flex:1;}
+.modal-badge{display:inline-flex;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);color:var(--gold);padding:.2rem .75rem;border-radius:100px;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.38rem;}
+.modal-title{font-size:1.1rem;font-weight:800;line-height:1.2;}
+.modal-close{width:34px;height:34px;border-radius:8px;border:1px solid var(--navy-b);background:rgba(255,255,255,.04);color:var(--slate);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;transition:all .2s;font-family:inherit;}
+.modal-close:hover{background:rgba(239,68,68,.1);color:#fca5a5;border-color:rgba(239,68,68,.3);}
+.modal-warn-bar{padding:.7rem 1.5rem;background:rgba(239,68,68,.06);border-bottom:1px solid rgba(239,68,68,.15);font-size:.78rem;color:#fca5a5;flex-shrink:0;}
+.modal-tabs{display:flex;gap:.35rem;padding:.85rem 1.5rem .0rem;border-bottom:1px solid var(--navy-b);flex-shrink:0;}
+.tab-btn{padding:.5rem 1rem;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--slate);cursor:pointer;font-size:.78rem;font-weight:500;transition:all .2s;font-family:inherit;margin-bottom:-1px;border-radius:7px 7px 0 0;}
+.tab-btn:hover{color:var(--white);}
+.tab-btn.on{color:var(--gold);border-bottom-color:var(--gold);}
+.modal-content{flex:1;overflow-y:auto;padding:1.35rem 1.5rem;scrollbar-width:thin;scrollbar-color:var(--navy-b) transparent;}
+.modal-content::-webkit-scrollbar{width:4px;}
+.modal-content::-webkit-scrollbar-thumb{background:var(--navy-b);border-radius:2px;}
+.tab-pane{display:none;}
+.tab-pane.on{display:block;}
+
+/* ── STEPS ── */
+.steps{list-style:none;display:flex;flex-direction:column;gap:.75rem;}
+.step{display:grid;grid-template-columns:36px 1fr;gap:.85rem;align-items:start;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:.9rem 1rem .9rem .65rem;transition:border-color .2s;}
+.step:hover{border-color:rgba(201,168,76,.2);}
+.sn{width:36px;height:36px;border-radius:8px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:var(--gold);font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb strong{display:block;color:var(--white);font-size:.88rem;margin-bottom:.25rem;}
+.sb p{color:var(--white-d);font-size:.8rem;line-height:1.55;}
+.tip{display:inline-flex;align-items:center;gap:.3rem;font-size:.71rem;color:#fcd34d;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.18);border-radius:5px;padding:.18rem .52rem;margin-top:.42rem;}
+
+/* ── QUESTIONS ── */
+.q-intro{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.16);border-radius:9px;padding:.85rem 1.1rem;margin-bottom:1rem;font-size:.81rem;color:#93c5fd;line-height:1.5;}
+.qlist{list-style:none;display:flex;flex-direction:column;gap:.5rem;}
+.qitem{display:flex;align-items:flex-start;gap:.65rem;padding:.65rem .9rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:9px;cursor:pointer;user-select:none;transition:all .2s;}
+.qitem:hover{background:rgba(255,255,255,.04);}
+.qitem.ck{background:rgba(34,197,94,.05);border-color:rgba(34,197,94,.18);}
+.qbox{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--navy-b);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:.68rem;color:transparent;transition:all .2s;}
+.qitem.ck .qbox{background:rgba(34,197,94,.18);border-color:var(--green);color:var(--green);}
+.qtxt{font-size:.83rem;color:var(--white-d);line-height:1.48;transition:color .2s;}
+.qitem.ck .qtxt{color:var(--white);}
+.qprog{display:flex;align-items:center;gap:.65rem;margin-top:.9rem;padding:.6rem .9rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:8px;}
+.qprog-lbl{font-size:.7rem;color:var(--slate);white-space:nowrap;}
+.qprog-track{flex:1;height:4px;background:var(--navy-b);border-radius:100px;overflow:hidden;}
+.qprog-fill{height:100%;background:linear-gradient(90deg,var(--green),#86efac);border-radius:100px;transition:width .35s;width:0%;}
+.qprog-ct{font-size:.7rem;font-weight:700;color:var(--white);white-space:nowrap;}
+
+/* ── LINK CARDS ── */
+.lcards{display:flex;flex-direction:column;gap:.65rem;}
+.lcard{display:flex;align-items:center;gap:.85rem;padding:.85rem 1.1rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:11px;text-decoration:none;color:inherit;transition:all .2s;}
+.lcard:hover{background:rgba(201,168,76,.06);border-color:rgba(201,168,76,.22);transform:translateX(4px);}
+.lcard-ico{width:36px;height:36px;border-radius:9px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;}
+.lcard-meta{flex:1;}
+.lcard-name{font-size:.85rem;font-weight:700;color:var(--white);margin-bottom:.15rem;}
+.lcard-desc{font-size:.74rem;color:var(--white-d);line-height:1.4;}
+.lcard-url{font-size:.66rem;color:var(--gold);margin-top:.1rem;}
+.lcard-arr{color:var(--slate);font-size:.82rem;transition:color .2s;}
+.lcard:hover .lcard-arr{color:var(--gold);}
+
+/* ── TAX SLIDE ── */
+.tax-journey{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:.6rem;align-items:center;max-width:1050px;margin-bottom:1.5rem;}
+.tj-box{background:var(--navy-c);border:1px solid var(--navy-b);border-radius:14px;padding:1.1rem;text-align:center;transition:border-color .25s;}
+.tj-box:hover{border-color:rgba(201,168,76,.3);}
+.tj-icon{font-size:1.6rem;margin-bottom:.4rem;}
+.tj-lbl{font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:.3rem;}
+.tj-amount{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;}
+.tj-amount.gold{color:var(--gold);}
+.tj-note{font-size:.7rem;color:var(--white-d);margin-top:.2rem;}
+.tj-op{font-size:1.4rem;color:var(--slate);font-weight:700;text-align:center;}
+.tj-result{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border:1px solid rgba(201,168,76,.25);border-radius:14px;padding:1.1rem;text-align:center;}
+.tj-result .tj-lbl{color:var(--gold);}
+.tj-result .tj-amount{color:var(--gold);font-size:1.8rem;}
+
+.tax-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:1050px;margin-bottom:1.5rem;}
+.tb-card{background:var(--navy-c);border:1px solid var(--navy-b);border-radius:13px;padding:1.1rem;}
+.tb-head{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--slate);margin-bottom:.75rem;}
+.tb-row{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.82rem;}
+.tb-row:last-child{border-bottom:none;}
+.tb-row .el{color:var(--white-d);}
+.tb-row .ev{font-weight:600;font-variant-numeric:tabular-nums;}
+.tb-row.total-row{margin-top:.35rem;padding-top:.65rem;border-top:1px solid rgba(201,168,76,.2);}
+.tb-row.total-row .el{color:var(--gold);font-weight:700;}
+.tb-row.total-row .ev{color:var(--gold);font-size:.95rem;}
+.tb-row.save-row .el{color:#86efac;font-size:.76rem;}
+.tb-row.save-row .ev{color:#86efac;}
+
+.rate-cards{display:flex;gap:.75rem;max-width:1050px;margin-bottom:1.5rem;}
+.rate-card{flex:1;border-radius:13px;padding:.9rem;text-align:center;border:1px solid;}
+.rate-card .rc-product{font-size:.7rem;font-weight:600;margin-bottom:.3rem;}
+.rate-card .rc-rate{font-size:1.3rem;font-weight:800;margin-bottom:.3rem;}
+.rate-card .rc-status{font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;}
+.rc-green{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.25);}
+.rc-green .rc-rate{color:#86efac;}
+.rc-green .rc-status{color:#86efac;}
+.rc-amber{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.25);}
+.rc-amber .rc-rate{color:#fcd34d;}
+.rc-amber .rc-status{color:#fcd34d;}
+.rc-red{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.25);}
+.rc-red .rc-rate{color:#fca5a5;}
+.rc-red .rc-status{color:#fca5a5;}
+
+.rcep-compare{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;max-width:1050px;background:linear-gradient(135deg,rgba(201,168,76,.07),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.2);border-radius:14px;padding:1.1rem 1.4rem;}
+.rc-col{text-align:center;}
+.rc-col-lbl{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:.4rem;}
+.rc-col-amount{font-size:1.45rem;font-weight:800;font-variant-numeric:tabular-nums;}
+.rc-col-sub{font-size:.7rem;color:var(--white-d);margin-top:.2rem;}
+.rc-arrow{font-size:1.5rem;color:var(--gold);text-align:center;}
+.rc-save{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);border-radius:10px;padding:.65rem;text-align:center;}
+.rc-save-num{font-size:1.3rem;font-weight:800;color:var(--gold);}
+.rc-save-lbl{font-size:.65rem;color:var(--white-d);text-transform:uppercase;letter-spacing:.08em;}
+
+/* ── RISKS ── */
+.risk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;max-width:1100px;margin-bottom:1.3rem;}
+.rcard{background:var(--navy-c);border:1px solid var(--navy-b);border-radius:13px;padding:1.25rem;position:relative;overflow:hidden;transition:transform .25s;}
+.rcard:hover{transform:translateY(-3px);}
+.rcard::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;}
+.r-crit::before{background:var(--red);}
+.r-high::before{background:var(--amber);}
+.rbadge{display:inline-flex;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.17rem .6rem;border-radius:100px;margin-bottom:.65rem;font-weight:700;border:1px solid;}
+.r-crit .rbadge{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.28);}
+.r-high .rbadge{background:rgba(245,158,11,.12);color:#fcd34d;border-color:rgba(245,158,11,.28);}
+.rtitle{font-size:.94rem;font-weight:700;margin-bottom:.42rem;}
+.rwhat{font-size:.78rem;color:var(--white-d);margin-bottom:.7rem;line-height:1.5;}
+.rfix{background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.13);border-radius:8px;padding:.65rem;font-size:.76rem;color:var(--white-d);line-height:1.5;}
+.rfix strong{display:block;color:#86efac;font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.22rem;}
+
+/* ── PLATFORMS ── */
+.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;max-width:1100px;margin-bottom:1.3rem;}
+.pf-card{background:var(--navy-c);border:1px solid var(--navy-b);border-radius:13px;padding:1.4rem;text-align:center;transition:transform .25s,border-color .25s;}
+.pf-card:hover{transform:translateY(-4px);border-color:rgba(201,168,76,.3);}
+.pf-emoji{font-size:2.2rem;margin-bottom:.75rem;}
+.pf-name{font-size:.97rem;font-weight:800;margin-bottom:.4rem;}
+.pf-desc{font-size:.78rem;color:var(--white-d);line-height:1.5;margin-bottom:.9rem;}
+.pf-tag{display:inline-block;font-size:.67rem;padding:.22rem .7rem;border-radius:100px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);color:var(--gold);}
+
+/* ── CHECKLIST ── */
+.cl-prog-bar{display:flex;align-items:center;gap:.9rem;max-width:1180px;background:var(--navy-c);border:1px solid var(--navy-b);border-radius:10px;padding:.65rem 1.1rem;margin-bottom:1.1rem;}
+.cl-prog-lbl{font-size:.7rem;color:var(--slate);white-space:nowrap;}
+.cl-prog-track{flex:1;height:5px;background:var(--navy-b);border-radius:100px;overflow:hidden;}
+.cl-prog-fill{height:100%;background:linear-gradient(90deg,var(--green),#86efac);border-radius:100px;transition:width .35s;width:0%;}
+.cl-prog-ct{font-size:.75rem;font-weight:700;color:var(--white);white-space:nowrap;}
+.cl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;max-width:1180px;}
+.cl-cat{background:var(--navy-c);border:1px solid var(--navy-b);border-radius:12px;padding:1.05rem;}
+.cl-hdr{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem;display:flex;align-items:center;gap:.35rem;}
+.clitem{display:flex;align-items:flex-start;gap:.5rem;padding:.48rem 0;border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;user-select:none;}
+.clitem:last-child{border-bottom:none;}
+.clitem:hover{opacity:.8;}
+.clchk{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--navy-b);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:.6rem;color:transparent;transition:all .2s;}
+.clitem.ck .clchk{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+.cltxt{font-size:.74rem;color:var(--white-d);line-height:1.42;transition:all .2s;}
+.clitem.ck .cltxt{text-decoration:line-through;opacity:.5;}
+
+/* ── NOTES PANEL ── */
+.notes-panel{position:fixed;top:50px;right:0;bottom:56px;width:360px;background:rgba(15,20,38,.97);border-left:1px solid var(--navy-b);backdrop-filter:blur(20px);z-index:400;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.notes-panel.open{transform:translateX(0);}
+.notes-hdr{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.1rem;border-bottom:1px solid var(--navy-b);flex-shrink:0;}
+.notes-hdr-lbl{font-size:.72rem;font-weight:700;color:var(--gold);letter-spacing:.05em;}
+.notes-close{background:transparent;border:none;color:var(--slate);cursor:pointer;font-size:1rem;font-family:inherit;padding:.2rem .4rem;}
+.notes-close:hover{color:var(--white);}
+.notes-body{flex:1;overflow-y:auto;padding:1.1rem;font-size:.82rem;color:var(--white-d);line-height:1.7;scrollbar-width:thin;scrollbar-color:var(--navy-b) transparent;}
+.notes-body::-webkit-scrollbar{width:4px;}
+.notes-body::-webkit-scrollbar-thumb{background:var(--navy-b);}
+.notes-body p{margin-bottom:.85rem;}
+.notes-body b{color:var(--white);}
+
+@media(max-width:900px){
+  .kgrid{grid-template-columns:1fr 1fr;}
+  .risk-grid,.pf-grid,.cl-grid{grid-template-columns:1fr;}
+  .tax-journey{grid-template-columns:1fr;gap:.5rem;}
+  .tj-op{display:none;}
+  .tax-breakdown{grid-template-columns:1fr;}
+  .rate-cards{flex-wrap:wrap;}
+  .rcep-compare{grid-template-columns:1fr;}
+  .notes-panel{width:100%;}
+  .sbody{padding:4rem 1.2rem 4.5rem;}
+}
+@media(max-width:600px){.kgrid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">ZAPEE Ventures</div>
+  <div class="topbar-right">
+    <div class="slide-ctr">Slide <b id="curNum">1</b> of <b>7</b></div>
+    <button class="notes-btn" onclick="toggleNotes()">📋 Speaker Notes</button>
+  </div>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="pfill" style="width:14.28%"></div></div>
+
+<!-- PHASE MODAL -->
+<div class="modal-overlay" id="phaseModal" onclick="closeModalOverlay(event)">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-ico" id="mIco"></div>
+      <div class="modal-meta">
+        <div class="modal-badge" id="mBadge"></div>
+        <div class="modal-title" id="mTitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-warn-bar" id="mWarn" style="display:none"></div>
+    <div class="modal-tabs" id="mTabNav"></div>
+    <div class="modal-content" id="mContent"></div>
+  </div>
+</div>
+
+<!-- NOTES PANEL -->
+<div class="notes-panel" id="notesPanel">
+  <div class="notes-hdr">
+    <span class="notes-hdr-lbl">📋 Speaker Notes — Slide <span id="noteSlideNum">1</span></span>
+    <button class="notes-close" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-body" id="noteBody"></div>
+</div>
+
+<!-- CAROUSEL -->
+<div class="carousel">
+<div class="track" id="track">
+
+<!-- SLIDE 1: COVER -->
+<section class="slide cover-slide">
+  <div class="cvgrid"></div><div class="cvglow"></div>
+  <div class="cvinner">
+    <div class="cvlbl">Confidential Intelligence Brief · June 2026</div>
+    <h1 class="cvh">China-to-Philippines<br><span class="accent">Import & E-Commerce</span><br>Operational Blueprint</h1>
+    <p class="cvp">The complete game plan for ZAPEE Ventures — from finding a Chinese supplier all the way to a customer clicking "buy" on Shopee, Lazada, or TikTok Shop.</p>
+    <div class="cvchips">
+      <span class="cvchip">5 Phases · 16 Steps</span>
+      <span class="cvchip">Shopee · Lazada · TikTok Shop</span>
+      <span class="cvchip">Bureau of Customs · Food and Drug Administration · Trade Agreement Ready</span>
+    </div>
+    <div class="cvhint">Press <span class="kpill">→</span> or click Next to begin</div>
+  </div>
+</section>
+
+<!-- SLIDE 2: KEY NUMBERS -->
+<section class="slide">
+  <div class="sbody">
+    <div class="lbl">Executive Overview</div>
+    <h2 class="ttl">Key Numbers Before We Begin</h2>
+    <p class="sub">These six figures define the financial reality of this business. Know them before you spend a peso.</p>
+    <div class="kgrid">
+      <div class="kcard"><div class="kico">📦</div><div class="klbl">Sea Freight — per Cubic Meter (all-in)</div><div class="kval" data-counter="9250" data-prefix="₱">₱0</div><div class="kdesc">Via CargoBoss. Includes the cargo, customs duties, and Value Added Tax. No surprise charges at the port.</div></div>
+      <div class="kcard"><div class="kico">✈️</div><div class="klbl">Air Freight — per Kilogram (all-in)</div><div class="kval" data-counter="650" data-prefix="₱">₱0</div><div class="kdesc">Faster (3–5 days). Best for urgent reorders or small high-value test shipments while sea orders are in transit.</div></div>
+      <div class="kcard"><div class="kico">🏛️</div><div class="klbl">Bureau of Customs Importer Registration</div><div class="kval">₱5,000</div><div class="kdesc">One-time fee to legally import commercially into the Philippines. Now valid for 3 years (2026 reform). Required before your first shipment.</div></div>
+      <div class="kcard"><div class="kico">🧪</div><div class="klbl">Food and Drug Administration Permit — per Product</div><div class="kval">₱1–2K</div><div class="kdesc">A Certificate of Product Notification is required for every unique product variant you sell. Budget this per product, per Stock Keeping Unit.</div></div>
+      <div class="kcard"><div class="kico">🌏</div><div class="klbl">Duty Reduction via Trade Agreement</div><div class="kval">5–30%</div><div class="kdesc">By requesting a Certificate of Origin from your supplier, ZAPEE qualifies for reduced duty rates under the Regional Comprehensive Economic Partnership Agreement. Free to request.</div></div>
+      <div class="kcard"><div class="kico">⚠️</div><div class="klbl">Undervaluation Penalty (Maximum Surcharge)</div><div class="kval">500%</div><div class="kdesc">If ZAPEE declares a lower invoice value than the real price and the Bureau of Customs detects it, they can impose up to 500% surcharge plus seize the goods.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: ROADMAP -->
+<section class="slide">
+  <div class="sbody">
+    <div class="lbl">The Full Roadmap</div>
+    <h2 class="ttl">5 Phases from Supplier to Sale</h2>
+    <p class="sub">These phases must happen in order — and Phase 4 (government permits) must start on Day 1 in parallel. <strong style="color:var(--white)">Click any phase icon below</strong> to see the step-by-step guide, self-check questions, and official links for that phase.</p>
+    <div class="roadmap">
+      <div class="rm-node">
+        <div class="rm-circle" onclick="openPhase(0)" title="Click to open Phase 1">🔍<div class="rm-n">1</div></div>
+        <div class="rm-name">Find Suppliers</div>
+        <div class="rm-detail">Qualify Chinese manufacturers on Alibaba</div>
+        <div class="rm-time">Week 1–2</div>
+        <div class="rm-click-hint">Click to open ↑</div>
+      </div>
+      <div class="rm-node">
+        <div class="rm-circle" onclick="openPhase(1)" title="Click to open Phase 2">🏷️<div class="rm-n">2</div></div>
+        <div class="rm-name">Brand & Pay</div>
+        <div class="rm-detail">ZAPEE branding on products. Pay via Alibaba escrow.</div>
+        <div class="rm-time">Week 2–3</div>
+        <div class="rm-click-hint">Click to open ↑</div>
+      </div>
+      <div class="rm-node">
+        <div class="rm-circle" onclick="openPhase(2)" title="Click to open Phase 3">🚢<div class="rm-n">3</div></div>
+        <div class="rm-name">Ship to Philippines</div>
+        <div class="rm-detail">CargoBoss freight forwarder. Bureau of Customs clearance.</div>
+        <div class="rm-time">Week 3–6</div>
+        <div class="rm-click-hint">Click to open ↑</div>
+      </div>
+      <div class="rm-node">
+        <div class="rm-circle" onclick="openPhase(3)" title="Click to open Phase 4" style="border-color:#EF4444;box-shadow:0 0 14px rgba(239,68,68,.25)">🏥<div class="rm-n" style="background:#EF4444">4</div></div>
+        <div class="rm-name">Get Permits</div>
+        <div class="rm-detail">Food and Drug Administration registration. Permit per product.</div>
+        <div class="rm-time" style="color:#fca5a5;border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08)">⛔ Start Day 1</div>
+        <div class="rm-click-hint">Click to open ↑</div>
+      </div>
+      <div class="rm-node">
+        <div class="rm-circle" onclick="openPhase(4)" title="Click to open Phase 5">🛒<div class="rm-n">5</div></div>
+        <div class="rm-name">Sell Online</div>
+        <div class="rm-detail">Register business. Launch Shopee, Lazada, TikTok Shop.</div>
+        <div class="rm-time">Week 6+</div>
+        <div class="rm-click-hint">Click to open ↑</div>
+      </div>
+    </div>
+    <div class="warn-box" style="max-width:900px;margin-top:.5rem;">⛔ <strong>Phase 4 — Government Permits — must start on Day 1, in parallel with everything else.</strong> Food and Drug Administration approval takes 4–8 weeks. If your shipment arrives at port before your permits are approved, it will be held indefinitely, with port storage fees accumulating every day.</div>
+  </div>
+</section>
+
+<!-- SLIDE 4: TAX -->
+<section class="slide">
+  <div class="sbody">
+    <div class="lbl">Financial Intelligence</div>
+    <h2 class="ttl">How Your Customs Tax Is Calculated</h2>
+    <p class="sub">Three numbers go in. One tax bill comes out. Here's exactly what the Bureau of Customs charges — and how to legally reduce it.</p>
+
+    <!-- Step 1: Money Journey -->
+    <div style="font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--slate);margin-bottom:.65rem;max-width:1050px;">Step 1 — What Does the Bureau of Customs See?</div>
+    <div class="tax-journey">
+      <div class="tj-box">
+        <div class="tj-icon">📦</div>
+        <div class="tj-lbl">You Pay Alibaba</div>
+        <div class="tj-amount">₱50,000</div>
+        <div class="tj-note">Product cost</div>
+      </div>
+      <div class="tj-op">+</div>
+      <div class="tj-box">
+        <div class="tj-icon">🚢</div>
+        <div class="tj-lbl">Shipping + Insurance</div>
+        <div class="tj-amount">₱5,000</div>
+        <div class="tj-note">CargoBoss sea freight</div>
+      </div>
+      <div class="tj-op">=</div>
+      <div class="tj-result">
+        <div class="tj-icon">📊</div>
+        <div class="tj-lbl">Customs Sees This Total</div>
+        <div class="tj-amount gold">₱55,000</div>
+        <div class="tj-note">Called the "Cost, Insurance &amp; Freight Value"</div>
+      </div>
+    </div>
+
+    <!-- Step 2 & 3: Breakdown + Rates -->
+    <div class="tax-breakdown">
+      <div class="tb-card">
+        <div class="tb-head">Step 2 — Your Tax Bill (Shampoo Example at 10% Duty)</div>
+        <div class="tb-row"><span class="el">Cost, Insurance &amp; Freight Value</span><span class="ev">₱55,000</span></div>
+        <div class="tb-row"><span class="el">Customs Duty (10% × ₱55,000)</span><span class="ev" style="color:#fcd34d">₱5,500</span></div>
+        <div class="tb-row"><span class="el">Total Landed Cost (add both)</span><span class="ev">₱60,500</span></div>
+        <div class="tb-row"><span class="el">Value Added Tax (12% × ₱60,500)</span><span class="ev" style="color:#fcd34d">₱7,260</span></div>
+        <div class="tb-row total-row"><span class="el">TOTAL TAX YOU PAY</span><span class="ev">₱12,760</span></div>
+      </div>
+      <div class="tb-card">
+        <div class="tb-head">Step 3 — Duty Rates by Product Type</div>
+        <div class="rate-cards" style="flex-direction:column;gap:.5rem;margin:0;">
+          <div class="rate-card rc-green" style="text-align:left;display:flex;align-items:center;justify-content:space-between;padding:.7rem .9rem;">
+            <span class="rc-product" style="font-size:.78rem;">🧼 Soap / Dishwashing / Cleaning Products</span>
+            <span class="rc-rate" style="font-size:1rem;">0–10%</span>
+          </div>
+          <div class="rate-card rc-green" style="text-align:left;display:flex;align-items:center;justify-content:space-between;padding:.7rem .9rem;">
+            <span class="rc-product" style="font-size:.78rem;">🧴 Shampoo / Hair Care</span>
+            <span class="rc-rate" style="font-size:1rem;">3–10%</span>
+          </div>
+          <div class="rate-card rc-amber" style="text-align:left;display:flex;align-items:center;justify-content:space-between;padding:.7rem .9rem;">
+            <span class="rc-product" style="font-size:.78rem;">💄 Cosmetics / Lotions / Skincare</span>
+            <span class="rc-rate" style="font-size:1rem;">10–15%</span>
+          </div>
+          <div class="rate-card rc-red" style="text-align:left;display:flex;align-items:center;justify-content:space-between;padding:.7rem .9rem;">
+            <span class="rc-product" style="font-size:.78rem;">🧻 Toilet Paper ⚠️ — Avoid Importing</span>
+            <span class="rc-rate" style="font-size:1rem;">Up to 65%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RCEP Comparison -->
+    <div style="font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--slate);margin-bottom:.65rem;max-width:1050px;">Bonus: Use the Trade Agreement to Save on Every Shipment</div>
+    <div class="rcep-compare">
+      <div class="rc-col">
+        <div class="rc-col-lbl">❌ Without Certificate of Origin</div>
+        <div class="rc-col-amount" style="color:#fca5a5;">₱12,760</div>
+        <div class="rc-col-sub">10% Duty + 12% Value Added Tax</div>
+      </div>
+      <div class="rc-arrow">→</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;flex:1;">
+        <div class="rc-save">
+          <div class="rc-save-num">💰 Save ₱1,650</div>
+          <div class="rc-save-lbl">per ₱50K shampoo shipment</div>
+        </div>
+        <div style="font-size:.75rem;color:var(--white-d);text-align:center;line-height:1.5;">Ask your Alibaba supplier for a <b style="color:var(--gold)">Certificate of Origin — Form E or Form RCEP.</b> It's free. China and Philippines are both members of the Regional Comprehensive Economic Partnership Agreement. This reduces your duty rate on most products by 5–30%.</div>
+      </div>
+      <div class="rc-arrow">←</div>
+      <div class="rc-col">
+        <div class="rc-col-lbl">✅ With Certificate of Origin</div>
+        <div class="rc-col-amount" style="color:#86efac;">₱11,110</div>
+        <div class="rc-col-sub">7% Duty + 12% Value Added Tax</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: RISKS -->
+<section class="slide">
+  <div class="sbody">
+    <div class="lbl">Risk Intelligence</div>
+    <h2 class="ttl">3 Things That Can Stop Your Shipment</h2>
+    <p class="sub">All three risks are completely preventable — but only if you act before the shipment leaves China.</p>
+    <div class="risk-grid">
+      <div class="rcard r-crit"><div class="rbadge">⛔ Critical Risk</div><div class="rtitle">Missing Food and Drug Administration Permits</div><div class="rwhat">Toiletries, shampoos, and cleaning products are regulated. If ZAPEE's company permit (License to Operate) or any product permit (Certificate of Product Notification) is not already approved when the shipment arrives at port, the Bureau of Customs holds it — indefinitely. Port storage fees accumulate every day.</div><div class="rfix"><strong>How to Prevent</strong>Secure the License to Operate and a Certificate of Product Notification for every unique product BEFORE placing your bulk order. Start Day 1 — it takes 4–8 weeks.</div></div>
+      <div class="rcard r-crit"><div class="rbadge">⛔ Critical Risk</div><div class="rtitle">Declaring a Lower Invoice Value Than You Actually Paid</div><div class="rwhat">The Bureau of Customs checks every declared value against international price databases. If your declared value is more than 30% below their benchmark, it triggers automatic seizure proceedings. The penalty is up to 500% of the taxes owed — plus possible permanent forfeiture of your entire shipment.</div><div class="rfix"><strong>How to Prevent</strong>Always declare the true price you paid on the commercial invoice. Never ask your supplier to write a lower value. Keep your Alibaba order records as proof.</div></div>
+      <div class="rcard r-high"><div class="rbadge">⚠️ High Risk</div><div class="rtitle">Using the Wrong Product Classification Code</div><div class="rwhat">Every imported product has a specific Harmonized System Tariff Code — an 8–10 digit international product number. One wrong digit can mean a higher duty rate, a mandatory physical inspection of your entire shipment, and significant delays at the port.</div><div class="rfix"><strong>How to Prevent</strong>Look up the correct code at finder.tariffcommission.gov.ph before your supplier writes the invoice. The same code must appear on the invoice, packing list, and Certificate of Origin.</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;max-width:1100px;">
+      <div style="background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.13);border-radius:12px;padding:1.1rem;">
+        <div style="font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:#fca5a5;margin-bottom:.85rem;">⛔ What Happens If Your Shipment Is Seized</div>
+        <div style="display:flex;flex-direction:column;gap:.55rem;">
+          <div style="display:flex;gap:.7rem;"><div style="min-width:58px;font-size:.66rem;color:var(--red);font-weight:700;">Day 1</div><div style="font-size:.78rem;color:var(--white-d);">Warrant of Seizure and Detention issued — cargo placed on hold at the port</div></div>
+          <div style="display:flex;gap:.7rem;"><div style="min-width:58px;font-size:.66rem;color:var(--red);font-weight:700;">Day 7–14</div><div style="font-size:.78rem;color:var(--white-d);">Formal Notice of Seizure delivered to ZAPEE — legal proceedings begin, storage fees accumulate</div></div>
+          <div style="display:flex;gap:.7rem;"><div style="min-width:58px;font-size:.66rem;color:var(--red);font-weight:700;">Day 30–90</div><div style="font-size:.78rem;color:var(--white-d);">Seizure hearing scheduled — ZAPEE must present original invoices to prove the true value</div></div>
+          <div style="display:flex;gap:.7rem;"><div style="min-width:58px;font-size:.66rem;color:var(--amber);font-weight:700;">Resolution</div><div style="font-size:.78rem;color:var(--white-d);">Pay all duties, taxes, and surcharges to release OR goods are permanently forfeited</div></div>
+        </div>
+      </div>
+      <div style="background:rgba(34,197,94,.04);border:1px solid rgba(34,197,94,.13);border-radius:12px;padding:1.1rem;">
+        <div style="font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:#86efac;margin-bottom:.85rem;">✅ The Prevention Protocol</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:.55rem;">
+          <li style="display:flex;gap:.6rem;font-size:.8rem;color:var(--white-d);"><span style="color:#86efac;font-weight:700;">✓</span>Use CargoBoss all-in rates — professionals handle all customs filing for you</li>
+          <li style="display:flex;gap:.6rem;font-size:.8rem;color:var(--white-d);"><span style="color:#86efac;font-weight:700;">✓</span>Have your Food and Drug Administration License to Operate and all Certificate of Product Notification numbers approved before any bulk order ships</li>
+          <li style="display:flex;gap:.6rem;font-size:.8rem;color:var(--white-d);"><span style="color:#86efac;font-weight:700;">✓</span>Verify Harmonized System Tariff Codes at the Philippine Tariff Commission website before each new product</li>
+          <li style="display:flex;gap:.6rem;font-size:.8rem;color:var(--white-d);"><span style="color:#86efac;font-weight:700;">✓</span>Always declare the true invoice value — no exceptions</li>
+          <li style="display:flex;gap:.6rem;font-size:.8rem;color:var(--white-d);"><span style="color:#86efac;font-weight:700;">✓</span>Request a Certificate of Origin from your supplier for every shipment</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: PLATFORMS -->
+<section class="slide">
+  <div class="sbody">
+    <div class="lbl">Market Entry</div>
+    <h2 class="ttl">The 3 Platforms ZAPEE Ventures Will Sell On</h2>
+    <p class="sub">Register all three simultaneously — they serve different buyer segments and together cover virtually the entire Philippine online shopping market.</p>
+    <div class="pf-grid">
+      <div class="pf-card"><div class="pf-emoji">🟠</div><div class="pf-name">Shopee Philippines</div><div class="pf-desc">Largest e-commerce platform in the Philippines by active users. Strong organic search traffic, built-in ShopeePay payment, and Shopee Express logistics. Best for everyday personal care and household products. Apply for Shopee Mall verified status to display a trust badge as a new seller.</div><div class="pf-tag">Dominant for mobile shoppers</div></div>
+      <div class="pf-card"><div class="pf-emoji">🟡</div><div class="pf-name">Lazada Philippines</div><div class="pf-desc">Second largest platform, backed by Alibaba Group. Attracts buyers looking for established brands. Lazada Mall status gives a verified badge that builds immediate trust for new sellers. Good for building a premium brand reputation alongside Shopee's volume-driven audience.</div><div class="pf-tag">Alibaba-backed infrastructure</div></div>
+      <div class="pf-card"><div class="pf-emoji">⬛</div><div class="pf-name">TikTok Shop Philippines</div><div class="pf-desc">Fastest-growing commerce platform in Southeast Asia. Products are discovered through short videos and live streams rather than search — giving ZAPEE a way to build an audience, not just a listing. Typically lower commission rates for new sellers. Strong reach with younger Filipino buyers.</div><div class="pf-tag">Fastest growing in Southeast Asia</div></div>
+    </div>
+    <div style="background:var(--navy-c);border:1px solid var(--navy-b);border-radius:12px;padding:1.1rem 1.35rem;max-width:1100px;">
+      <div style="font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem;">What All 3 Platforms Require to Register as a Business Seller</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;font-size:.78rem;color:var(--white-d);">
+        <div>✓ Department of Trade and Industry or Securities and Exchange Commission registration certificate</div>
+        <div>✓ Bureau of Internal Revenue Certificate of Registration (Form 2303)</div>
+        <div>✓ Business bank account (not a personal account) for payout processing</div>
+        <div>✓ Food and Drug Administration License to Operate (for personal care products)</div>
+        <div>✓ Valid government-issued ID of the authorized business representative</div>
+        <div>✓ Product photos and descriptions ready before any listing goes live</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: CHECKLIST -->
+<section class="slide">
+  <div class="sbody">
+    <div class="lbl">Operational Readiness</div>
+    <h2 class="ttl">Pre-Launch Checklist</h2>
+    <p class="sub">Complete all 24 items before your first bulk order. Click each item to mark it done.</p>
+    <div class="cl-prog-bar">
+      <span class="cl-prog-lbl">Overall completion</span>
+      <div class="cl-prog-track"><div class="cl-prog-fill" id="clpfill"></div></div>
+      <span class="cl-prog-ct" id="clpct">0 / 24 Complete</span>
+    </div>
+    <div class="cl-grid">
+      <div class="cl-cat"><div class="cl-hdr">🏢 Government Registrations</div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Department of Trade and Industry OR Securities and Exchange Commission General Partnership registered</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Bureau of Internal Revenue Certificate of Registration (Form 2303) obtained</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Bureau of Customs importer accreditation filed and approved (₱5,000 — 3 years)</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Business bank account opened under ZAPEE Ventures' registered entity</span></div>
+      </div>
+      <div class="cl-cat"><div class="cl-hdr">🏥 Food and Drug Administration</div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Registered as a Trader at the Food and Drug Administration e-Services portal</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">License to Operate approved and active (company-level permit)</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Certificate of Product Notification filed and approved for every unique product</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Certificate of Product Notification reference numbers printed on all product labels</span></div>
+      </div>
+      <div class="cl-cat"><div class="cl-hdr">🚢 Shipping & Customs</div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">CargoBoss account created and shipping cost confirmed for this order</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Harmonized System Tariff Code verified for every product at the Philippine Tariff Commission website</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Certificate of Origin (Form E or Form RCEP) requested from Alibaba supplier</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">True Cost, Insurance, and Freight value confirmed on invoice — no undervaluation</span></div>
+      </div>
+      <div class="cl-cat"><div class="cl-hdr">🛒 Platform Accounts</div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Shopee Seller Center account created, documents uploaded, account verified</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Lazada Seller Center account created, documents uploaded, account verified</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">TikTok Shop Philippines account created, documents uploaded, account verified</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Product listings live on all 3 platforms with photos, descriptions, and pricing</span></div>
+      </div>
+      <div class="cl-cat"><div class="cl-hdr">📦 Alibaba & Supplier</div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Gold Supplier with Trade Assurance identified and verified for each product</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Product samples received, tested, and quality approved</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Original Equipment Manufacturer branding (ZAPEE Ventures name and logo) confirmed on a branded sample</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Minimum Order Quantity, price per unit, and production timeline agreed in writing</span></div>
+      </div>
+      <div class="cl-cat"><div class="cl-hdr">💰 Financial Planning</div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Full cost model built: product + freight + duties + Value Added Tax + Food and Drug Administration fees</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Retail price set to cover all costs plus platform commission (7–15%) with healthy margin</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Working capital covers at least 2 full shipment cycles without running short</span></div>
+        <div class="clitem" onclick="toggleCl(this)"><div class="clchk">✓</div><span class="cltxt">Customer service and returns process defined for all 3 platforms</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /track -->
+</div><!-- /carousel -->
+
+<!-- BOTTOM NAV -->
+<div class="botnav">
+  <button class="nav-btn" id="prevBtn" onclick="go(cur-1)" disabled>←</button>
+  <div class="dots" id="dotsEl"></div>
+  <button class="nav-btn" id="nextBtn" onclick="go(cur+1)">→</button>
+</div>
+
+<script>
+// ── PHASE DATA ──
+const PHASES = [
+  { num:1, icon:'🔍', badge:'Phase 1 of 5 — Alibaba Sourcing', title:'Finding & Qualifying Your Chinese Suppliers',
+    steps:[
+      {t:'Filter for "Gold Supplier" and "Verified Supplier" on Alibaba.com',d:'Use the filter checkboxes for Gold Supplier (paid membership indicating business legitimacy) and Verified Supplier (factory audited by a third party). These are the minimum standards. Never contact suppliers who have neither badge.'},
+      {t:'Check every supplier\'s profile before sending a message',d:'Look for: at least 3 years on Alibaba, Trade Assurance enabled, response rate above 80%, and positive transaction reviews. A supplier with no reviews or less than 1 year on the platform is too risky for a first order.'},
+      {t:'Send a Request for Quotation — a formal price inquiry',d:'A Request for Quotation is a message asking multiple suppliers: What is your unit price? What is the smallest quantity I can order? How long does production take? Can you apply my brand name to the packaging? What does a sample cost? Use Alibaba\'s built-in Request for Quotation system to send one inquiry to multiple suppliers simultaneously.',tip:'Contact at least 3–5 suppliers per product to compare prices and quality'},
+      {t:'Order physical product samples before any bulk order',d:'Always receive and test 2–5 physical samples before committing to a large shipment. Check quality, packaging, label accuracy, and how the product survived shipping. Budget ₱500–₱3,000 per sample including delivery to the Philippines.'},
+      {t:'Negotiate price, Minimum Order Quantity, and production timeline',d:'The first quoted price is rarely the final price. Compare quotes from competitors and push for 20–30% lower. Confirm the Minimum Order Quantity (the smallest batch they\'ll produce), the exact unit price at that quantity, and the number of days from payment to shipment.'}
+    ],
+    questions:['Have I found at least 3 Gold Suppliers for each product — with Trade Assurance enabled?','Have I checked that each supplier has been on Alibaba for at least 3 years with positive reviews?','Have I physically received, tested, and approved product samples — not just looked at online photos?','Am I satisfied with the quality relative to the price I will be paying?','Do I know the exact Minimum Order Quantity and price per unit from my chosen supplier?','Is the total first order cost (products + shipping) within ZAPEE Ventures\' startup budget?'],
+    links:[
+      {ico:'🛒',name:'Alibaba.com — Main Supplier Marketplace',desc:'Where you search for products, filter for Gold Suppliers, read reviews, and contact manufacturers directly.',url:'https://www.alibaba.com',display:'www.alibaba.com'},
+      {ico:'📋',name:'Alibaba Request for Quotation System',desc:'Submit one product inquiry and receive quotes from multiple suppliers at once. Saves hours of back-and-forth messaging.',url:'https://sourcing.alibaba.com',display:'sourcing.alibaba.com'},
+      {ico:'🚢',name:'CargoBoss Philippines — Research Freight Costs Early',desc:'Check shipping rates during Phase 1 so you can factor them into your total landed cost from the very start.',url:'https://www.cargoboss.ph',display:'www.cargoboss.ph'}
+    ]
+  },
+  { num:2, icon:'🏷️', badge:'Phase 2 of 5 — Private Labeling & Payment', title:'Putting ZAPEE\'s Brand on Products & Paying Safely',
+    steps:[
+      {t:'Ask if the supplier offers Original Equipment Manufacturer (OEM) services',d:'Original Equipment Manufacturer means the factory makes the product but puts YOUR brand name and logo on the packaging instead of their own. Most Gold Suppliers offer this. Say: "We want private label packaging with our brand name and logo." Confirm any extra cost and minimum quantity for OEM production.'},
+      {t:'Get a branded sample approved before bulk production begins',d:'Ask the supplier to produce one sample unit with ZAPEE Ventures\' actual branding applied. Check: logo placement, text accuracy, colors, and overall presentation. Do not approve bulk production until this branded sample is exactly right.'},
+      {t:'Design labels that meet Philippine government requirements',d:'Labels must include: product name in English, complete ingredients list, net content (weight or volume), country of origin ("Made in China"), ZAPEE Ventures as the Philippine importer/distributor, and — once approved — the Food and Drug Administration Certificate of Product Notification reference number.',tip:'Do not finalize and print labels until you have the Food and Drug Administration permit number to include'},
+      {t:'Pay ONLY through Alibaba Trade Assurance — never direct bank transfer',d:'Alibaba Trade Assurance holds your payment in escrow until you confirm delivery as described. Never pay via Western Union, MoneyGram, or a personal bank account — these cannot be reversed if something goes wrong.'},
+      {t:'Philippine payment methods accepted on Alibaba',d:'Alibaba accepts Philippine credit cards, debit cards, and GCash Mastercard. All payments should still route through Trade Assurance regardless of which payment method you use.'}
+    ],
+    questions:['Has the supplier confirmed they can apply ZAPEE Ventures\' brand name and logo to the packaging?','Have I received and physically approved a branded sample — not just a digital mockup?','Does my label include all required Philippine information: ingredients, net content, country of origin ("Made in China"), and ZAPEE Ventures as importer?','Have I already started the Food and Drug Administration permit process so the permit number will be ready before labels are printed?','Am I paying exclusively through Alibaba Trade Assurance — never direct bank transfer to a supplier?'],
+    links:[
+      {ico:'🔒',name:'Alibaba Trade Assurance — Secure Payment',desc:'The only safe way to pay Alibaba suppliers. Your money is held in escrow and released only when you confirm goods arrived as described.',url:'https://trade.alibaba.com',display:'trade.alibaba.com'},
+      {ico:'🏥',name:'Food and Drug Administration Philippines — Start Permits Early',desc:'Start your License to Operate and Certificate of Product Notification applications during Phase 2 — permit numbers must be on labels before printing.',url:'https://www.fda.gov.ph',display:'www.fda.gov.ph'}
+    ]
+  },
+  { num:3, icon:'🚢', badge:'Phase 3 of 5 — Logistics & Customs', title:'Shipping Your Products to the Philippines',
+    steps:[
+      {t:'Create a CargoBoss account and choose your shipping method',d:'CargoBoss is a Philippine freight forwarder specializing in China imports. Their all-inclusive rates cover the cargo, customs duties, Value Added Tax, and Manila warehouse delivery. Sea freight: ₱9,250 per cubic meter (7–15 days, for large bulk orders). Air freight: ₱650 per kilogram (3–5 days, for urgent or small test orders).',tip:'Sea freight is significantly cheaper per unit — use it for all regular bulk orders'},
+      {t:'Register ZAPEE Ventures as an importer with the Bureau of Customs',d:'You must have Bureau of Customs importer accreditation before any commercial shipment can legally clear customs. Fee: ₱5,000 — now valid for 3 years (2026 reform). Register at customs.gov.ph.'},
+      {t:'Look up the correct Harmonized System Tariff Code for every product',d:'Every imported product has an 8–10 digit Harmonized System Tariff Code. One wrong digit can mean higher duties and mandatory physical inspections. Look up the correct code at the Philippine Tariff Commission website before your supplier prepares the commercial invoice.'},
+      {t:'Request a Certificate of Origin from your supplier before shipment',d:'Ask for "Form E" or "Form RCEP" — this proves your goods are manufactured in China. Because China and the Philippines are both Regional Comprehensive Economic Partnership Agreement members, this qualifies ZAPEE for reduced duty rates of 5–30% below the standard rate. It is free and issued by your supplier\'s export authority.'},
+      {t:'Always declare the TRUE cost on the commercial invoice',d:'The Bureau of Customs cross-references your declared value against international price benchmarks. If your declared value is more than 30% below their benchmark, it triggers seizure proceedings and up to 500% surcharge. Always declare the real price you paid. No exceptions.',tip:'⛔ This is the most common — and most costly — mistake first-time importers make'}
+    ],
+    questions:['Has ZAPEE Ventures completed Bureau of Customs importer accreditation (₱5,000, 3 years)?','Have I created a CargoBoss account and confirmed the shipping cost for this specific order?','Have I verified the correct Harmonized System Tariff Code for every product at the Philippine Tariff Commission website?','Have I requested a Certificate of Origin (Form E or Form RCEP) from my supplier?','Is the commercial invoice showing the TRUE actual price I paid — not a lower value?','Do all shipping documents (invoice, packing list, Certificate of Origin) show the same codes and descriptions?'],
+    links:[
+      {ico:'🚢',name:'CargoBoss Philippines — All-In Freight Forwarder',desc:'Sea freight ₱9,250/cubic meter · Air freight ₱650/kg. All rates include customs duties and Value Added Tax. No hidden charges.',url:'https://www.cargoboss.ph',display:'www.cargoboss.ph'},
+      {ico:'💰',name:'CargoBoss Rate Sheet — Current Pricing',desc:'Check the latest sea and air freight rates, volume calculators, and service details before confirming your order.',url:'https://www.cargoboss.ph/pages/rates',display:'www.cargoboss.ph/pages/rates'},
+      {ico:'🏛️',name:'Bureau of Customs Philippines — Importer Registration',desc:'Register ZAPEE Ventures as an accredited importer. Fee: ₱5,000, valid 3 years. Required before any commercial shipment.',url:'https://customs.gov.ph',display:'customs.gov.ph'},
+      {ico:'🔍',name:'Philippine Tariff Commission — Tariff Code Finder',desc:'Look up Harmonized System Tariff Codes and current duty rates for every product. Verify before every new product or shipment.',url:'https://finder.tariffcommission.gov.ph',display:'finder.tariffcommission.gov.ph'}
+    ]
+  },
+  { num:4, icon:'🏥', badge:'Phase 4 of 5 — Start on Day 1', title:'Food and Drug Administration Permits — The Most Critical Phase',
+    warn:'⛔ Start this phase on Day 1, in parallel with everything else. Permit approval takes 4–8 weeks. If your shipment arrives at the port before these permits are approved, it will be held indefinitely — with port storage fees accumulating every day.',
+    steps:[
+      {t:'Register ZAPEE Ventures as a "Trader" with the Food and Drug Administration',d:'A "Trader" is a business that imports and distributes products it did not manufacture — which is exactly what ZAPEE Ventures does. Register under the Trader category (not Manufacturer or Retailer) through the Food and Drug Administration e-Services portal at eservices.fda.gov.ph.'},
+      {t:'Apply for a License to Operate from the Food and Drug Administration',d:'The License to Operate is ZAPEE Ventures\' company-level permit to legally import and distribute regulated health, cosmetic, and personal care products in the Philippines. Must be renewed annually. This is separate from product-level permits — you need both.'},
+      {t:'File a Certificate of Product Notification for each unique product (₱1,000–₱2,000 each)',d:'A Certificate of Product Notification is required for every individual product variant you sell. Shampoo 200ml and shampoo 500ml are separate filings. File through the Food and Drug Administration e-Services portal. Keep every Certificate of Product Notification number — you need it for product labels and for customs clearance.',tip:'If you plan to sell 6 products, budget ₱6,000–₱12,000 in permit fees and 4–8 weeks for approval'},
+      {t:'Print the Certificate of Product Notification reference number on every label',d:'Once each product\'s permit is approved, the Food and Drug Administration issues a reference number. This number must be printed on the label of every unit you sell. The Bureau of Customs checks for this during import clearance. Do not approve bulk label printing until this number is confirmed and included.'}
+    ],
+    questions:['Is ZAPEE Ventures registered as a "Trader" with the Food and Drug Administration Philippines?','Does ZAPEE Ventures hold an active, approved License to Operate?','Does every unique product have its own approved Certificate of Product Notification on file?','Is the Certificate of Product Notification reference number printed on every product label before bulk label printing?','Has the full permit fee budget (₱1,000–₱2,000 per product) been included in the startup financial plan?'],
+    links:[
+      {ico:'🏥',name:'Food and Drug Administration Philippines — Official Website',desc:'Main government site for all regulations, guidelines, and information on regulated health and personal care products.',url:'https://www.fda.gov.ph',display:'www.fda.gov.ph'},
+      {ico:'💻',name:'Food and Drug Administration e-Services Portal — Apply Here',desc:'Where you register as a Trader, apply for a License to Operate, and file Certificate of Product Notifications. Track all application statuses here.',url:'https://eservices.fda.gov.ph',display:'eservices.fda.gov.ph'}
+    ]
+  },
+  { num:5, icon:'🛒', badge:'Phase 5 of 5 — Business Registration & Launch', title:'Registering ZAPEE Ventures & Going Live on All 3 Platforms',
+    steps:[
+      {t:'Register ZAPEE Ventures\' business with the appropriate government agency',d:'Sole proprietor: Register the business name with the Department of Trade and Industry at bnrs.dti.gov.ph. Multiple partners: Register as a General Partnership with the Securities and Exchange Commission at sec.gov.ph. The Securities and Exchange Commission route provides legal protection to all partners and is required for business bank accounts and corporate seller verification.'},
+      {t:'Get a Certificate of Registration from the Bureau of Internal Revenue',d:'After business registration, register with the Bureau of Internal Revenue to receive a Certificate of Registration (Form 2303). This makes ZAPEE Ventures a registered taxpayer, allows you to issue official receipts to customers, and is required by all 3 selling platforms during business seller account verification.'},
+      {t:'Open a dedicated ZAPEE Ventures business bank account',d:'All 3 platforms require a business bank account (not a personal account) to process payouts. Open under ZAPEE Ventures\' registered business name. BDO, BPI, or UnionBank business accounts are widely accepted across all platforms.'},
+      {t:'Register seller accounts on Shopee, Lazada, and TikTok Shop',d:'You need: Department of Trade and Industry or Securities and Exchange Commission certificate, Bureau of Internal Revenue Form 2303, business bank account, and Food and Drug Administration License to Operate. Apply for Shopee Mall, Lazada Mall, or TikTok Business Seller status for a verified badge and higher buyer trust.',tip:'Apply for mall status on all 3 platforms from the start — it significantly improves conversion for new sellers'},
+      {t:'Build your product listings and run a test order before going live',d:'For each product on each platform: upload high-quality photos (white background plus lifestyle shots), write detailed descriptions including the Food and Drug Administration permit number, set competitive prices after accounting for platform commission (7–15%), configure shipping settings, and complete a test order on each platform before publicly announcing you are open.'}
+    ],
+    questions:['Is ZAPEE Ventures officially registered with the Department of Trade and Industry (sole proprietor) or Securities and Exchange Commission (partnership)?','Does ZAPEE Ventures have a Bureau of Internal Revenue Certificate of Registration (Form 2303)?','Does ZAPEE Ventures have a dedicated business bank account — not a personal account?','Are all 3 seller accounts (Shopee, Lazada, TikTok Shop) verified and approved?','Are all product listings live with photos, descriptions, Food and Drug Administration permit numbers, and correct pricing?','Do we have enough physical inventory to fill real customer orders without immediately running out?','Does ZAPEE Ventures have a customer service process for returns, complaints, and questions on each platform?'],
+    links:[
+      {ico:'🏢',name:'Department of Trade and Industry — Business Name Registration',desc:'For sole proprietors: register ZAPEE Ventures\' business name. Online registration usually approved in 1–2 business days.',url:'https://bnrs.dti.gov.ph',display:'bnrs.dti.gov.ph'},
+      {ico:'🤝',name:'Securities and Exchange Commission Philippines',desc:'For multi-partner operations: register as a General Partnership. Required for corporate bank accounts and seller verification.',url:'https://www.sec.gov.ph',display:'www.sec.gov.ph'},
+      {ico:'📄',name:'Bureau of Internal Revenue Philippines',desc:'Register for a Certificate of Registration (Form 2303). Required by all 3 selling platforms to verify business sellers.',url:'https://www.bir.gov.ph',display:'www.bir.gov.ph'},
+      {ico:'🟠',name:'Shopee Seller Center Philippines',desc:'Register ZAPEE Ventures\' Shopee store, upload products, manage orders. Apply for Shopee Mall verified status.',url:'https://seller.shopee.ph',display:'seller.shopee.ph'},
+      {ico:'🟡',name:'Lazada Seller Center Philippines',desc:'Register ZAPEE Ventures\' Lazada store. Apply for Lazada Mall status for a verified business seller badge.',url:'https://sellercenter.lazada.com.ph',display:'sellercenter.lazada.com.ph'},
+      {ico:'⬛',name:'TikTok Shop Philippines',desc:'Register ZAPEE Ventures\' TikTok Shop. Sell through short videos and live streams. Fastest-growing platform in Southeast Asia.',url:'https://seller-ph.tiktok.com',display:'seller-ph.tiktok.com'}
+    ]
+  }
+];
+
+// ── SPEAKER NOTES ──
+const NOTES = [
+  `<p><b>Slide 1 — Opening</b></p><p>Good morning / good afternoon. Thank you for being here. What you're about to see is ZAPEE Ventures' complete operational blueprint — our full game plan for importing personal care and household products from China and selling them online in the Philippines.</p><p>This covers everything from finding the right Chinese supplier, branding our products, navigating customs, getting government permits, and launching on Shopee, Lazada, and TikTok Shop.</p><p>By the end of this presentation, you'll understand exactly how this business works — from supplier to sale. Let's get into it.</p>`,
+
+  `<p><b>Slide 2 — Key Numbers</b></p><p>Before we walk through the process, let me give you the financial reality of this business upfront.</p><p>Our freight partner, CargoBoss, charges <b>₱9,250 per cubic meter</b> for sea freight — and that's all-in. Customs duties and Value Added Tax are already included. No surprise charges. Air freight is <b>₱650 per kilogram</b> for urgent orders.</p><p>We pay <b>₱5,000 once</b> to register with the Bureau of Customs as a legal importer — now valid for three years as of 2026.</p><p>Each product we sell needs a government health permit from the Food and Drug Administration — that's <b>₱1,000 to ₱2,000 per product.</b></p><p>Here's the big opportunity: by using the Regional Comprehensive Economic Partnership trade agreement between China and the Philippines, we can <b>legally cut our duty rates by 5 to 30%</b> — just by requesting a Certificate of Origin from our supplier, at no cost.</p><p>And the critical warning: <b>never declare a lower invoice value than what you actually paid.</b> The Bureau of Customs can impose up to 500% surcharge. We never do this.</p>`,
+
+  `<p><b>Slide 3 — The Roadmap</b></p><p>This is our complete five-phase roadmap. These phases must happen in order — and each one has specific things we need to complete before moving forward.</p><p>Phase 1 is sourcing on Alibaba. Phase 2 is branding and safe payment. Phase 3 is shipping and customs clearance. Phase 4 is government permits — and this one is critical. We start Phase 4 on Day 1, in parallel with everything else, because it takes 4 to 8 weeks to get approved. Phase 5 is registering our business and going live on all three platforms.</p><p><b>Click any phase icon to see the detailed step-by-step guide, self-check questions, and direct links to every website you need.</b></p>`,
+
+  `<p><b>Slide 4 — How Taxes Work</b></p><p>Every shipment to the Philippines gets taxed. Let me show you exactly how.</p><p>The Bureau of Customs does not just tax the product price alone — they tax the <b>Cost, Insurance, and Freight value</b>: product cost plus shipping plus insurance, all added together. In our example, ₱50,000 product plus ₱5,000 shipping equals ₱55,000.</p><p>At a <b>10% duty rate</b> for shampoo, that's ₱5,500 in customs duty. Then add <b>12% Value Added Tax</b> on the total — that's ₱7,260. Total tax bill: <b>₱12,760.</b></p><p>Here's the move: by requesting a Certificate of Origin from our supplier — which is free — we reduce the duty from 10% down to 7% under the Regional Comprehensive Economic Partnership Agreement. Same shipment: we <b>save ₱1,650.</b> Multiply that across every shipment all year and it's significant.</p><p>One product we are not importing: <b>toilet paper</b>. At up to 65% duty plus 12% Value Added Tax, the margins simply do not work.</p>`,
+
+  `<p><b>Slide 5 — Risk Matrix</b></p><p>Three risks can stop our entire supply chain — and all three are completely preventable.</p><p><b>Risk one — missing Food and Drug Administration permits.</b> If our company permit or any product permit is not already approved before the shipment arrives at port, the Bureau of Customs holds it indefinitely, with storage fees accumulating every day. This is why we start Phase 4 on Day 1.</p><p><b>Risk two — undervaluing the invoice.</b> Some importers ask suppliers to write a lower price to reduce taxes. The Bureau of Customs knows market prices — they will catch it. The penalty is up to 500% of the taxes owed, plus possible permanent forfeiture of the goods. We always declare the true price.</p><p><b>Risk three — wrong product code.</b> Every product has a Harmonized System Tariff Code. One wrong digit can trigger a physical inspection and higher duty rates. We verify every code at the Philippine Tariff Commission website before every shipment.</p><p>If a shipment is seized, the process on the left shows how slow and expensive it becomes. Prevention is the only right answer.</p>`,
+
+  `<p><b>Slide 6 — Platforms</b></p><p>ZAPEE Ventures launches on all three platforms simultaneously — not one at a time.</p><p><b>Shopee</b> is the largest e-commerce platform in the Philippines. It has the most active users, the best organic search traffic for everyday products, and a built-in payment and logistics system. We apply for Shopee Mall status early to display a verified badge.</p><p><b>Lazada</b> is the second largest, backed by Alibaba Group. It attracts buyers looking for established brands. Lazada Mall status gives us a verified badge that builds immediate trust as a new seller.</p><p><b>TikTok Shop</b> is the fastest-growing commerce platform in Southeast Asia. Products are discovered through short videos and live streams — giving ZAPEE a way to build a real audience, not just a product listing. Commission rates are also often lower for new sellers.</p><p>All three platforms require the same business documents: government registration, Bureau of Internal Revenue certificate, a business bank account, and our Food and Drug Administration permits.</p>`,
+
+  `<p><b>Slide 7 — The Checklist</b></p><p>This is our operational readiness checklist. <b>Twenty-four items across six categories</b> stand between ZAPEE Ventures and our first bulk order.</p><p>Click each item to mark it done as you work through it. The six categories cover: government registration, Food and Drug Administration permits, shipping and customs preparation, platform seller accounts, Alibaba supplier qualification, and financial planning.</p><p>We do not place our first bulk order until every single box is checked. Each item has a real consequence if skipped.</p><p>When all 24 are green — ZAPEE Ventures is ready to launch. Thank you. I'm happy to take any questions.</p>`
+];
+
+// ── CAROUSEL ──
+let cur = 0;
+const TOTAL = 7;
+const track = document.getElementById('track');
+const pfill = document.getElementById('pfill');
+const curNum = document.getElementById('curNum');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const dotsEl = document.getElementById('dotsEl');
+
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' on':'');
+  d.onclick=()=>go(i);
+  dotsEl.appendChild(d);
+}
+
+function go(n){
+  cur=Math.max(0,Math.min(n,TOTAL-1));
+  track.style.transform=`translateX(-${cur*100}vw)`;
+  curNum.textContent=cur+1;
+  pfill.style.width=((cur+1)/TOTAL*100)+'%';
+  prevBtn.disabled=cur===0;
+  nextBtn.disabled=cur===TOTAL-1;
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===cur));
+  document.getElementById('noteSlideNum').textContent=cur+1;
+  document.getElementById('noteBody').innerHTML=NOTES[cur];
+  if(cur===1) animateKPIs();
+}
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('phaseModal').classList.contains('open')){
+    if(e.key==='Escape') closeModal();
+    return;
+  }
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') go(cur+1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') go(cur-1);
+});
+
+let tx=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(document.getElementById('phaseModal').classList.contains('open')) return;
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50) go(cur+(dx<0?1:-1));
+});
+
+// ── KPI COUNTERS ──
+let kpiDone=false;
+function animateKPIs(){
+  if(kpiDone)return;kpiDone=true;
+  document.querySelectorAll('[data-counter]').forEach(el=>{
+    const target=parseInt(el.dataset.counter),prefix=el.dataset.prefix||'',dur=1400,start=performance.now();
+    const run=t=>{const p=Math.min((t-start)/dur,1),e=1-Math.pow(1-p,3);el.textContent=prefix+Math.floor(e*target).toLocaleString();if(p<1)requestAnimationFrame(run);};
+    requestAnimationFrame(run);
+  });
+}
+
+// ── PHASE MODAL ──
+let activeTabs={};
+function openPhase(idx){
+  const ph=PHASES[idx];
+  document.getElementById('mIco').textContent=ph.icon;
+  document.getElementById('mBadge').textContent=ph.badge;
+  document.getElementById('mTitle').textContent=ph.title;
+  const warnEl=document.getElementById('mWarn');
+  if(ph.warn){warnEl.textContent=ph.warn;warnEl.style.display='block';}
+  else{warnEl.style.display='none';}
+  // Build tabs
+  const tabNav=document.getElementById('mTabNav');
+  tabNav.innerHTML='';
+  ['Step-by-Step Guide','Check Yourself First','Official Links'].forEach((lbl,ti)=>{
+    const btn=document.createElement('button');
+    btn.className='tab-btn'+(ti===0?' on':'');
+    btn.textContent=lbl;
+    btn.onclick=()=>switchTab(idx,ti);
+    tabNav.appendChild(btn);
+  });
+  activeTabs[idx]=0;
+  renderTab(idx,0);
+  document.getElementById('phaseModal').classList.add('open');
+}
+
+function switchTab(phIdx,tabIdx){
+  activeTabs[phIdx]=tabIdx;
+  document.querySelectorAll('#mTabNav .tab-btn').forEach((b,i)=>b.classList.toggle('on',i===tabIdx));
+  renderTab(phIdx,tabIdx);
+}
+
+function renderTab(phIdx,tabIdx){
+  const ph=PHASES[phIdx];
+  const content=document.getElementById('mContent');
+  if(tabIdx===0){
+    content.innerHTML='<ul class="steps">'+ph.steps.map((s,i)=>`<li class="step"><div class="sn">${i+1}</div><div class="sb"><strong>${s.t}</strong><p>${s.d}</p>${s.tip?`<span class="tip">💡 ${s.tip}</span>`:''}</div></li>`).join('')+'</ul>';
+  }else if(tabIdx===1){
+    const qId='qg'+phIdx;
+    content.innerHTML=`<div class="q-intro">Before moving to the next phase, answer <strong>YES</strong> to all of these. If any is NO, complete that step first.</div><div class="question-group"><ul class="qlist" id="${qId}list">${ph.questions.map(q=>`<li class="qitem" onclick="toggleQ(this,'${qId}')"><div class="qbox">✓</div><span class="qtxt">${q}</span></li>`).join('')}</ul><div class="qprog"><span class="qprog-lbl">Self-check progress</span><div class="qprog-track"><div class="qprog-fill" id="qf-${qId}"></div></div><span class="qprog-ct" id="qct-${qId}">0 / ${ph.questions.length}</span></div></div>`;
+  }else{
+    content.innerHTML='<div class="lcards">'+ph.links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener noreferrer" class="lcard"><div class="lcard-ico">${l.ico}</div><div class="lcard-meta"><div class="lcard-name">${l.name}</div><div class="lcard-desc">${l.desc}</div><div class="lcard-url">${l.display}</div></div><div class="lcard-arr">↗</div></a>`).join('')+'</div>';
+  }
+}
+
+function closeModal(){document.getElementById('phaseModal').classList.remove('open');}
+function closeModalOverlay(e){if(e.target.id==='phaseModal') closeModal();}
+
+// ── QUESTION CHECKBOXES ──
+function toggleQ(item,groupId){
+  item.classList.toggle('ck');
+  const list=document.getElementById(groupId+'list');
+  if(!list) return;
+  const items=list.querySelectorAll('.qitem'),checked=list.querySelectorAll('.qitem.ck');
+  const fill=document.getElementById('qf-'+groupId),ct=document.getElementById('qct-'+groupId);
+  if(fill) fill.style.width=(checked.length/items.length*100)+'%';
+  if(ct) ct.textContent=checked.length+' / '+items.length;
+}
+
+// ── CHECKLIST ──
+function toggleCl(item){
+  item.classList.toggle('ck');
+  const all=document.querySelectorAll('.clitem'),done=document.querySelectorAll('.clitem.ck');
+  document.getElementById('clpfill').style.width=(done.length/all.length*100)+'%';
+  document.getElementById('clpct').textContent=done.length+' / '+all.length+' Complete';
+}
+
+// ── NOTES PANEL ──
+let notesOpen=false;
+function toggleNotes(){
+  notesOpen=!notesOpen;
+  document.getElementById('notesPanel').classList.toggle('open',notesOpen);
+}
+
+// ── INIT ──
+document.getElementById('noteBody').innerHTML=NOTES[0];
+</script>
+</body>
+</html>
